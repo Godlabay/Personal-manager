@@ -1,0 +1,102 @@
+/* General */
+"app.name" = "Personal Manager";
+"action.cancel" = "Cancel";
+"action.done" = "Done";
+"action.save" = "Save";
+"action.delete" = "Delete";
+"action.add" = "Add";
+"action.edit" = "Edit";
+"action.defer" = "Defer";
+"action.breakDown" = "Break down";
+"action.startFocus" = "Start focus";
+"common.close" = "Close";
+
+/* Tabs */
+"tab.today" = "Today";
+"tab.upcoming" = "Upcoming";
+"tab.inbox" = "Inbox";
+"tab.projects" = "Projects";
+"tab.ai" = "AI";
+
+/* Inbox */
+"inbox.empty.title" = "Inbox is clear.";
+"inbox.empty.subtitle" = "Dump anything here — the agent sorts it out later.";
+
+/* Today */
+"today.empty.title" = "Nothing on the menu for today.";
+"today.empty.subtitle" = "Take a breath. Or ask the agent for a gentle suggestion.";
+
+/* Upcoming */
+"upcoming.empty.title" = "Clear skies ahead.";
+"upcoming.empty.subtitle" = "Nothing scheduled in the next two weeks.";
+
+/* Projects */
+"projects.empty.title" = "No projects yet.";
+"projects.empty.subtitle" = "Create one from the agent, or via Quick Add.";
+"project.empty.title" = "This project is empty.";
+"project.empty.subtitle" = "Add a task to get moving.";
+
+/* QuickAdd */
+"quickadd.title" = "New task";
+"quickadd.placeholder" = "Call dentist tomorrow 10am";
+"quickadd.voice.hint" = "Hold to speak";
+
+/* Settings */
+"settings.title" = "Settings";
+"settings.theme" = "Theme";
+"settings.theme.ember" = "Ember (warm)";
+"settings.theme.midnight" = "Midnight";
+"settings.theme.parchment" = "Parchment";
+"settings.theme.system" = "Match system";
+"settings.ai.title" = "AI assistant";
+"settings.ai.manage" = "Manage provider & key";
+"settings.ai.provider" = "Provider";
+"settings.ai.model" = "Model";
+"settings.ai.key" = "API key";
+"settings.ai.key.placeholder" = "sk-…";
+"settings.ai.test" = "Test connection";
+"settings.ai.clearKeys" = "Clear all keys";
+"settings.ai.clearKeys.confirm" = "This removes every API key stored on this device.";
+"settings.ai.help" = "Your key stays in the iOS Keychain and is sent only to the provider you choose.";
+"settings.account" = "Account";
+"settings.account.signedIn" = "Signed in as";
+"settings.account.signOut" = "Sign out";
+
+/* Sign-in */
+"signin.subtitle" = "A warm home for your tasks, ideas, and half-finished plans.";
+"signin.email.placeholder" = "your@email.com";
+"signin.send" = "Send magic link";
+"signin.sent.title" = "Check your inbox.";
+"signin.sent.body" = "Tap the link we sent — you'll come right back here, signed in.";
+
+/* AI onboarding */
+"ai.onboarding.title" = "Outsource your brain";
+"ai.onboarding.body" = "The agent needs a key to one of OpenAI, Anthropic, Gemini, or Groq. You pay for your own usage — typically cents per day. You can skip this and use the app without AI.";
+"ai.onboarding.getKey" = "Get an API key";
+"ai.onboarding.skip" = "Skip for now";
+
+/* Focus */
+"focus.title" = "Focus session";
+"focus.duration.25" = "25 min";
+"focus.duration.50" = "50 min";
+"focus.duration.90" = "90 min";
+"focus.ambience" = "Ambience";
+"focus.ambience.loading" = "Loading…";
+"focus.ambience.loadFailed" = "Ambience offline";
+"focus.start" = "Start";
+"focus.stop" = "Stop";
+"focus.phase.ready" = "Ready";
+"focus.phase.focus" = "Focus";
+"focus.phase.break" = "Break";
+"focus.phase.done" = "Done";
+"focus.action.start" = "Start";
+"focus.action.stop" = "Stop";
+"focus.action.finish" = "Finish";
+"focus.done.message" = "Nice. You did the thing.";
+"focus.finished.title" = "Nice.";
+"focus.finished.subtitle" = "You did the thing.";
+
+/* Agent */
+"agent.greeting" = "Hi. Voice dump, type, or just ask. I've got you.";
+"agent.thinking" = "Thinking…";
+"agent.compose.placeholder" = "Ask or dump";
