@@ -75,8 +75,11 @@ export default function TodayScreen() {
         contentContainerStyle={tasks.length === 0 ? { flex: 1 } : undefined}
       />
 
+      {/* FAB: tap = QuickAdd, long-press = Voice capture */}
       <Pressable
         onPress={() => router.push('/quick-add')}
+        onLongPress={() => router.push('/voice')}
+        delayLongPress={400}
         style={{
           position: 'absolute',
           right: spacing.xl,
