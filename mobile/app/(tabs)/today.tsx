@@ -1,27 +1,30 @@
 import { useCallback, useEffect, useState } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from 'react-native';
 import { useTheme } from '@/design/theme';
 import { TaskRow } from '@/design/components/TaskRow';
 import { EmptyState } from '@/design/components/EmptyState';
-import { WarmButton } from '@/design/components/WarmButton';
+import { KarmaBadge } from '@/design/components/KarmaBadge';
 import { listToday, completeTask, reopenTask } from '@/core/models/tasks';
+import { getKarma, type KarmaState } from '@/core/karma/karma';
 import { supabase } from '@/core/supabase/client';
 import type { Task } from '@/core/models/types';
 import { t } from '@/core/i18n/strings';
 
 export default function TodayScreen() {
-  const { palette, spacing } = useTheme();
+  const { palette, spacing, fonts } = useTheme();
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [karma, setKarmaState] = useState<KarmaState | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      const next = await listToday();
+      const [next, k] = await Promise.all([listToday(), getKarma()]);
       setTasks(next);
+      setKarmaState(k);
     } catch {
       // Network blips — keep current list, let user retry.
     }
@@ -55,11 +58,26 @@ export default function TodayScreen() {
     }
   };
 
+  const header = (
+    <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.sm, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md }}>
+      <Text style={[fonts.title, { color: palette.text }]}>{t('tab_today')}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+        {karma ? (
+          <KarmaBadge karma={karma.karma} currentStreak={karma.current_streak} longestStreak={karma.longest_streak} compact />
+        ) : null}
+        <Pressable onPress={() => router.push('/search')} hitSlop={10} accessibilityLabel={t('search_placeholder')}>
+          <Ionicons name="search" size={22} color={palette.text} />
+        </Pressable>
+      </View>
+    </View>
+  );
+
   return (
     <View style={{ flex: 1, backgroundColor: palette.background }}>
       <FlatList
         data={tasks}
         keyExtractor={(t) => t.id}
+        ListHeaderComponent={header}
         renderItem={({ item }) => (
           <TaskRow
             title={item.title}

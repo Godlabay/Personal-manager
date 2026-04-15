@@ -1,4 +1,7 @@
 import { supabase } from '../supabase/client';
+import { nextOccurrence, parseRRule } from '../recurrence/rrule';
+import { onTaskCompleted } from '../karma/karma';
+import { cancelRemindersForTask } from '../notifications/notifications';
 import type { Task, TaskDraft } from './types';
 
 /**
@@ -94,7 +97,46 @@ export async function updateTask(id: string, patch: Partial<Task>): Promise<Task
 }
 
 export async function completeTask(id: string): Promise<Task> {
-  return updateTask(id, { status: 'done', completed_at: new Date().toISOString() });
+  // Fetch before we flip status so we still know the recurrence rule.
+  const { data: original } = await supabase
+    .from('tasks')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+
+  const updated = await updateTask(id, { status: 'done', completed_at: new Date().toISOString() });
+
+  // If this task has a recurrence rule, spawn the next instance as a fresh open task.
+  if (original?.recurrence_rrule && original?.due_at) {
+    const rule = parseRRule(original.recurrence_rrule as string);
+    if (rule) {
+      const next = nextOccurrence(rule, new Date(original.due_at as string));
+      if (next) {
+        await supabase.from('tasks').insert({
+          title: original.title,
+          description: original.description,
+          project_id: original.project_id,
+          section_id: original.section_id,
+          parent_task_id: original.parent_task_id,
+          priority: original.priority,
+          due_at: next.toISOString(),
+          due_has_time: original.due_has_time,
+          recurrence_rrule: original.recurrence_rrule,
+          estimated_minutes: original.estimated_minutes,
+          energy_level: original.energy_level,
+          kanban_column: original.kanban_column,
+        });
+      }
+    }
+  }
+
+  // Karma / streak update — fire-and-forget; never block the UI on it.
+  onTaskCompleted().catch(() => {});
+
+  // Cancel any pending local reminders — no point nudging for a done task.
+  cancelRemindersForTask(id).catch(() => {});
+
+  return updated;
 }
 
 export async function reopenTask(id: string): Promise<Task> {

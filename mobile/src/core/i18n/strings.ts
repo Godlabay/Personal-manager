@@ -57,6 +57,38 @@ const i18n = new I18n({
     focus_stop: 'Stop',
     focus_done_warm: 'Nice. One small win.',
 
+    // Karma
+    karma_title: 'Karma & streak',
+    karma_sub_empty: 'Your first done task lights the fire.',
+    karma_sub_longest: 'Best streak so far: {n} days.',
+
+    // Search
+    search_placeholder: 'Search your tasks…',
+    search_hint: 'Search by title. Tap a result to jump in.',
+    search_empty: 'Nothing matches. Try fewer words.',
+
+    // Filters
+    filters_title: 'Saved filters',
+    filters_empty: 'No filters yet. Save one to come back fast.',
+    filter_new: 'New filter',
+    filter_name: 'Name',
+    filter_query: 'Search query',
+    filter_priority: 'Priority',
+    filter_with_due: 'Only with a due date',
+
+    // Reminders / notifications
+    reminders_permission_title: 'Enable gentle reminders',
+    reminders_permission_msg: 'We\'ll nudge you only for tasks you opted in.',
+    reminder_scheduled: 'Reminder set.',
+
+    // Kanban
+    kanban_view: 'Kanban',
+    list_view: 'List',
+    col_todo: 'To do',
+    col_doing: 'Doing',
+    col_done: 'Done',
+    col_blocked: 'Blocked',
+
     // Generic
     cancel: 'Cancel',
     save: 'Save',
@@ -102,6 +134,38 @@ const i18n = new I18n({
     focus_start: 'Focus',
     focus_stop: 'Arrêter',
     focus_done_warm: 'Beau boulot. Une petite victoire.',
+
+    // Karma
+    karma_title: 'Karma & série',
+    karma_sub_empty: 'Ta première tâche terminée allume le feu.',
+    karma_sub_longest: 'Meilleure série : {n} jours.',
+
+    // Search
+    search_placeholder: 'Cherche une tâche…',
+    search_hint: 'Recherche par titre. Tape un résultat pour l\'ouvrir.',
+    search_empty: 'Rien ne correspond. Essaie moins de mots.',
+
+    // Filters
+    filters_title: 'Filtres enregistrés',
+    filters_empty: 'Aucun filtre. Enregistres-en un pour revenir vite.',
+    filter_new: 'Nouveau filtre',
+    filter_name: 'Nom',
+    filter_query: 'Recherche',
+    filter_priority: 'Priorité',
+    filter_with_due: 'Seulement celles avec date',
+
+    // Reminders / notifications
+    reminders_permission_title: 'Rappels doux',
+    reminders_permission_msg: 'On te fera signe seulement pour ce que tu as choisi.',
+    reminder_scheduled: 'Rappel programmé.',
+
+    // Kanban
+    kanban_view: 'Kanban',
+    list_view: 'Liste',
+    col_todo: 'À faire',
+    col_doing: 'En cours',
+    col_done: 'Fait',
+    col_blocked: 'Bloqué',
 
     cancel: 'Annuler',
     save: 'Enregistrer',

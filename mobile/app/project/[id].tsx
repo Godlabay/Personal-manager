@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import { ActionSheetIOS, Alert, FlatList, Platform, Pressable, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/design/theme';
 import { TaskRow } from '@/design/components/TaskRow';
 import { EmptyState } from '@/design/components/EmptyState';
+import { KanbanBoard, KANBAN_COLUMNS, type KanbanColumn } from '@/design/components/KanbanBoard';
 import { supabase } from '@/core/supabase/client';
-import { listByProject, completeTask, reopenTask } from '@/core/models/tasks';
-import type { Task, Project } from '@/core/models/types';
-import { useRouter as useNav } from 'expo-router';
+import { listByProject, completeTask, reopenTask, updateTask } from '@/core/models/tasks';
+import type { Task, Project, ProjectViewMode } from '@/core/models/types';
+import { t } from '@/core/i18n/strings';
 
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -16,6 +17,7 @@ export default function ProjectDetailScreen() {
   const { palette, spacing, fonts, radius } = useTheme();
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [viewMode, setViewMode] = useState<ProjectViewMode>('list');
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -23,7 +25,10 @@ export default function ProjectDetailScreen() {
       supabase.from('projects').select('*').eq('id', id).single(),
       listByProject(id),
     ]);
-    if (proj) setProject(proj as Project);
+    if (proj) {
+      setProject(proj as Project);
+      setViewMode((proj as Project).view_mode ?? 'list');
+    }
     setTasks(taskList);
   }, [id]);
 
@@ -44,6 +49,46 @@ export default function ProjectDetailScreen() {
       if (task.status === 'done') await reopenTask(task.id);
       else await completeTask(task.id);
     } catch { load(); }
+  };
+
+  const toggleViewMode = async () => {
+    const next: ProjectViewMode = viewMode === 'kanban' ? 'list' : 'kanban';
+    setViewMode(next);
+    // Persist choice on the project so it sticks across sessions.
+    await supabase.from('projects').update({ view_mode: next }).eq('id', id);
+  };
+
+  const moveCard = async (task: Task, targetCol: KanbanColumn) => {
+    // "done" column also flips status; others go back to open.
+    const patch: Partial<Task> = { kanban_column: targetCol };
+    if (targetCol === 'done') {
+      patch.status = 'done';
+      patch.completed_at = new Date().toISOString();
+    } else if (task.status === 'done') {
+      patch.status = 'open';
+      patch.completed_at = null;
+    }
+    setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, ...patch } as Task : t)));
+    try {
+      await updateTask(task.id, patch);
+    } catch {
+      load();
+    }
+  };
+
+  const onLongPressCard = (task: Task) => {
+    const options = KANBAN_COLUMNS.map((c) => t(`col_${c}`));
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        { options: [...options, t('cancel')], cancelButtonIndex: options.length, title: task.title },
+        (idx) => { if (idx < options.length) moveCard(task, KANBAN_COLUMNS[idx]); },
+      );
+    } else {
+      Alert.alert(task.title, 'Déplacer vers…', [
+        ...KANBAN_COLUMNS.map((c) => ({ text: t(`col_${c}`), onPress: () => moveCard(task, c) })),
+        { text: t('cancel'), style: 'cancel' as const },
+      ]);
+    }
   };
 
   const open = tasks.filter((t) => t.status === 'open');
@@ -70,59 +115,70 @@ export default function ProjectDetailScreen() {
         <Text style={[fonts.title2, { color: palette.text, flex: 1 }]} numberOfLines={1}>
           {project?.name ?? '…'}
         </Text>
+        <Pressable onPress={toggleViewMode} hitSlop={8} accessibilityLabel={viewMode === 'kanban' ? t('list_view') : t('kanban_view')}>
+          <Ionicons name={viewMode === 'kanban' ? 'list' : 'grid'} size={22} color={palette.accent} />
+        </Pressable>
         <Pressable onPress={() => router.push({ pathname: '/quick-add', params: { projectId: id } } as never)} hitSlop={8}>
           <Ionicons name="add" size={26} color={palette.accent} />
         </Pressable>
       </View>
 
-      <FlatList
-        data={open}
-        keyExtractor={(t) => t.id}
-        renderItem={({ item }) => (
-          <TaskRow
-            title={item.title}
-            priority={item.priority}
-            completed={false}
-            meta={item.due_at ? new Date(item.due_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : undefined}
-            onToggle={() => onToggle(item)}
-            onPress={() => router.push({ pathname: '/quick-add', params: { taskId: item.id } } as never)}
-          />
-        )}
-        ItemSeparatorComponent={() => <View style={{ height: 1, backgroundColor: palette.outline, marginLeft: spacing.xl + 24 }} />}
-        ListHeaderComponent={
-          open.length === 0 ? null : (
-            <Text style={[fonts.footnote, { color: palette.textMuted, marginHorizontal: spacing.lg, marginTop: spacing.lg, marginBottom: spacing.xs, textTransform: 'uppercase', letterSpacing: 0.5 }]}>
-              {open.length} tâche{open.length > 1 ? 's' : ''}
-            </Text>
-          )
-        }
-        ListEmptyComponent={
-          <EmptyState
-            icon="✅"
-            title="Tout est fait"
-            message="Ajoute une tâche avec le + en haut à droite."
-          />
-        }
-        ListFooterComponent={
-          done.length === 0 ? null : (
-            <View>
-              <Text style={[fonts.footnote, { color: palette.textMuted, marginHorizontal: spacing.lg, marginTop: spacing.xxl, marginBottom: spacing.xs, textTransform: 'uppercase', letterSpacing: 0.5 }]}>
-                Complétées ({done.length})
+      {viewMode === 'kanban' ? (
+        tasks.length === 0 ? (
+          <EmptyState icon="🪁" title="Vide" message="Ajoute une tâche avec le + en haut à droite." />
+        ) : (
+          <KanbanBoard tasks={tasks} onTaskLongPress={onLongPressCard} />
+        )
+      ) : (
+        <FlatList
+          data={open}
+          keyExtractor={(t) => t.id}
+          renderItem={({ item }) => (
+            <TaskRow
+              title={item.title}
+              priority={item.priority}
+              completed={false}
+              meta={item.due_at ? new Date(item.due_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : undefined}
+              onToggle={() => onToggle(item)}
+              onPress={() => router.push({ pathname: '/quick-add', params: { taskId: item.id } } as never)}
+            />
+          )}
+          ItemSeparatorComponent={() => <View style={{ height: 1, backgroundColor: palette.outline, marginLeft: spacing.xl + 24 }} />}
+          ListHeaderComponent={
+            open.length === 0 ? null : (
+              <Text style={[fonts.footnote, { color: palette.textMuted, marginHorizontal: spacing.lg, marginTop: spacing.lg, marginBottom: spacing.xs, textTransform: 'uppercase', letterSpacing: 0.5 }]}>
+                {open.length} tâche{open.length > 1 ? 's' : ''}
               </Text>
-              {done.map((item) => (
-                <TaskRow
-                  key={item.id}
-                  title={item.title}
-                  priority={item.priority}
-                  completed
-                  onToggle={() => onToggle(item)}
-                />
-              ))}
-            </View>
-          )
-        }
-        contentContainerStyle={open.length === 0 ? { flex: 1 } : { paddingBottom: spacing.xxxl }}
-      />
+            )
+          }
+          ListEmptyComponent={
+            <EmptyState
+              icon="✅"
+              title="Tout est fait"
+              message="Ajoute une tâche avec le + en haut à droite."
+            />
+          }
+          ListFooterComponent={
+            done.length === 0 ? null : (
+              <View>
+                <Text style={[fonts.footnote, { color: palette.textMuted, marginHorizontal: spacing.lg, marginTop: spacing.xxl, marginBottom: spacing.xs, textTransform: 'uppercase', letterSpacing: 0.5 }]}>
+                  Complétées ({done.length})
+                </Text>
+                {done.map((item) => (
+                  <TaskRow
+                    key={item.id}
+                    title={item.title}
+                    priority={item.priority}
+                    completed
+                    onToggle={() => onToggle(item)}
+                  />
+                ))}
+              </View>
+            )
+          }
+          contentContainerStyle={open.length === 0 ? { flex: 1 } : { paddingBottom: spacing.xxxl }}
+        />
+      )}
     </View>
   );
 }

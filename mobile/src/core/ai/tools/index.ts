@@ -19,6 +19,7 @@ export { rescheduleTool } from './reschedule';
 export { deferTaskTool } from './deferTask';
 export { dailyBriefTool } from './dailyBrief';
 export { startFocusSessionTool } from './startFocusSession';
+export { setReminderTool } from './setReminder';
 
 import { createTaskTool } from './createTask';
 import { breakDownTaskTool } from './breakDownTask';
@@ -26,6 +27,7 @@ import { rescheduleTool } from './reschedule';
 import { deferTaskTool } from './deferTask';
 import { dailyBriefTool } from './dailyBrief';
 import { startFocusSessionTool } from './startFocusSession';
+import { setReminderTool } from './setReminder';
 
 export const ALL_TOOLS: AgentTool[] = [
   createTaskTool,
@@ -34,6 +36,7 @@ export const ALL_TOOLS: AgentTool[] = [
   deferTaskTool,
   dailyBriefTool,
   startFocusSessionTool,
+  setReminderTool,
 ];
 
 export function findTool(name: string): AgentTool | undefined {

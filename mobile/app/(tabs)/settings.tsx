@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useTheme } from '@/design/theme';
 import { WarmButton } from '@/design/components/WarmButton';
+import { KarmaBadge } from '@/design/components/KarmaBadge';
 import {
   PROVIDERS,
   clearAllKeys,
@@ -21,9 +22,11 @@ import {
 } from '@/core/ai/keys';
 import { buildProvider } from '@/core/ai/providerRegistry';
 import { signOut } from '@/core/auth/auth';
+import { getKarma, type KarmaState } from '@/core/karma/karma';
 import { t } from '@/core/i18n/strings';
 import type { ThemeChoice } from '@/design/theme';
 import { Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const THEME_OPTIONS: { value: ThemeChoice; label: string }[] = [
   { value: 'system', label: 'Auto' },
@@ -33,12 +36,14 @@ const THEME_OPTIONS: { value: ThemeChoice; label: string }[] = [
 ];
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const { palette, spacing, fonts, radius, choice, setChoice } = useTheme();
   const [selectedProvider, setSelectedProviderState] = useState<ProviderId>('openai');
   const [keyInput, setKeyInput] = useState('');
   const [savedKey, setSavedKey] = useState<string | null>(null);
   const [testStatus, setTestStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle');
   const [testError, setTestError] = useState('');
+  const [karma, setKarmaState] = useState<KarmaState | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -46,6 +51,8 @@ export default function SettingsScreen() {
       setSelectedProviderState(p);
       const k = await getApiKey(p);
       setSavedKey(k);
+      const karmaState = await getKarma();
+      setKarmaState(karmaState);
     })();
   }, []);
 
@@ -113,6 +120,21 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: bg }} contentContainerStyle={{ paddingBottom: 80 }}>
+
+      {/* Karma + streak */}
+      {karma ? (
+        <View style={[card, { padding: spacing.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
+          <View style={{ flex: 1 }}>
+            <Text style={[fonts.headline, { color: palette.text }]}>{t('karma_title')}</Text>
+            <Text style={[fonts.footnote, { color: palette.textMuted, marginTop: spacing.xxs }]}>
+              {karma.longest_streak > 0
+                ? t('karma_sub_longest').replace('{n}', String(karma.longest_streak))
+                : t('karma_sub_empty')}
+            </Text>
+          </View>
+          <KarmaBadge karma={karma.karma} currentStreak={karma.current_streak} longestStreak={karma.longest_streak} />
+        </View>
+      ) : null}
 
       {/* Theme */}
       <Text style={sectionTitle}>{t('settings_theme')}</Text>
@@ -193,6 +215,20 @@ export default function SettingsScreen() {
             <Text style={[fonts.footnote, { color: palette.danger }]}>Effacer toutes les clés</Text>
           </Pressable>
         )}
+      </View>
+
+      {/* Shortcuts */}
+      <Text style={sectionTitle}>Raccourcis</Text>
+      <View style={card}>
+        <Pressable onPress={() => router.push('/filters')} style={row}>
+          <Text style={[fonts.body, { flex: 1, color: palette.text }]}>{t('filters_title')}</Text>
+          <Text style={{ color: palette.textMuted, fontSize: 18 }}>›</Text>
+        </Pressable>
+        <View style={{ height: 1, backgroundColor: palette.outline }} />
+        <Pressable onPress={() => router.push('/search')} style={row}>
+          <Text style={[fonts.body, { flex: 1, color: palette.text }]}>{t('search_placeholder')}</Text>
+          <Text style={{ color: palette.textMuted, fontSize: 18 }}>›</Text>
+        </Pressable>
       </View>
 
       {/* Sign out */}
