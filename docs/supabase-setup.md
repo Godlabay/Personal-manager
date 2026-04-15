@@ -28,6 +28,11 @@ Copie-colle tout le contenu de `supabase/migrations/0001_init.sql` et clique **R
 
 Copie-colle tout le contenu de `supabase/migrations/0002_rls.sql` et clique **Run**.
 
+### Migration 3 — Storage (pour les pièces jointes)
+
+Copie-colle tout le contenu de `supabase/migrations/0003_storage.sql` et clique **Run**.
+Ça crée le bucket `attachments` (privé) + les policies d'accès par utilisateur.
+
 ## 4. Activer le magic link
 
 Dans Supabase → **Authentication → Providers → Email** :
@@ -62,3 +67,5 @@ permet de confirmer.)
 | `relation "tasks" does not exist` | Migration pas appliquée | Relance 0001_init.sql |
 | `permission denied for table tasks` | RLS bloque | Relance 0002_rls.sql |
 | Magic link ne redirige pas | Redirect URL manquante | Ajoute `personalmanager://auth-callback` |
+| `bucket "attachments" does not exist` | Migration storage pas appliquée | Relance 0003_storage.sql |
+| Upload pièce jointe échoue (`new row violates row-level security`) | Policies storage pas créées | Relance 0003_storage.sql |

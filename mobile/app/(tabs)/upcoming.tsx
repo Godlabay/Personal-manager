@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { SectionList, Text, View } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { Pressable, SectionList, Text, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/design/theme';
 import { TaskRow } from '@/design/components/TaskRow';
 import { EmptyState } from '@/design/components/EmptyState';
+import { Timeline } from '@/design/components/Timeline';
 import { listUpcoming, completeTask } from '@/core/models/tasks';
 import type { Task } from '@/core/models/types';
 import { t } from '@/core/i18n/strings';
@@ -28,11 +30,13 @@ function groupByDay(tasks: Task[]): Section[] {
 
 export default function UpcomingScreen() {
   const { palette, spacing, fonts } = useTheme();
-  const [sections, setSections] = useState<Section[]>([]);
+  const router = useRouter();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [view, setView] = useState<'list' | 'timeline'>('list');
 
   const load = useCallback(async () => {
-    const tasks = await listUpcoming(21);
-    setSections(groupByDay(tasks));
+    const next = await listUpcoming(21);
+    setTasks(next);
   }, []);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
@@ -43,11 +47,32 @@ export default function UpcomingScreen() {
     load();
   };
 
+  const sections = groupByDay(tasks);
+
+  const header = (
+    <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.sm, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Text style={[fonts.title, { color: palette.text }]}>{t('tab_upcoming')}</Text>
+      <Pressable onPress={() => setView((v) => (v === 'list' ? 'timeline' : 'list'))} hitSlop={10}>
+        <Ionicons name={view === 'timeline' ? 'list' : 'calendar'} size={22} color={palette.accent} />
+      </Pressable>
+    </View>
+  );
+
+  if (view === 'timeline') {
+    return (
+      <View style={{ flex: 1, backgroundColor: palette.background }}>
+        {header}
+        <Timeline tasks={tasks} days={14} onTaskPress={(task) => router.push(`/task/${task.id}`)} />
+      </View>
+    );
+  }
+
   return (
     <SectionList
       style={{ backgroundColor: palette.background }}
       sections={sections}
       keyExtractor={(item) => item.id}
+      ListHeaderComponent={header}
       renderSectionHeader={({ section }) => (
         <View style={{ backgroundColor: palette.background, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.xs }}>
           <Text style={[fonts.footnote, { color: palette.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 }]}>
@@ -61,6 +86,7 @@ export default function UpcomingScreen() {
           priority={item.priority}
           completed={item.status === 'done'}
           onToggle={() => onToggle(item)}
+          onPress={() => router.push(`/task/${item.id}`)}
         />
       )}
       ListEmptyComponent={

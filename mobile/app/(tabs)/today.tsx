@@ -63,7 +63,9 @@ export default function TodayScreen() {
       <Text style={[fonts.title, { color: palette.text }]}>{t('tab_today')}</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
         {karma ? (
-          <KarmaBadge karma={karma.karma} currentStreak={karma.current_streak} longestStreak={karma.longest_streak} compact />
+          <Pressable onPress={() => router.push('/insights')} hitSlop={4} accessibilityLabel="Insights">
+            <KarmaBadge karma={karma.karma} currentStreak={karma.current_streak} longestStreak={karma.longest_streak} compact />
+          </Pressable>
         ) : null}
         <Pressable onPress={() => router.push('/search')} hitSlop={10} accessibilityLabel={t('search_placeholder')}>
           <Ionicons name="search" size={22} color={palette.text} />
@@ -85,6 +87,7 @@ export default function TodayScreen() {
             completed={item.status === 'done'}
             meta={item.due_at ? formatMeta(item.due_at, item.due_has_time) : undefined}
             onToggle={() => onToggle(item)}
+            onPress={() => router.push(`/task/${item.id}`)}
           />
         )}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={palette.accent} />}

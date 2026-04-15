@@ -19,6 +19,8 @@
       "infoPlist": {
         "NSMicrophoneUsageDescription": "We use the microphone only when you tap the voice-capture button, to turn your spoken notes into tasks. Recognition runs on-device whenever possible.",
         "NSSpeechRecognitionUsageDescription": "We use speech recognition to turn your voice notes into tasks. It runs on-device when your device supports it.",
+        "NSCameraUsageDescription": "Attach photos to your tasks — a snap of a whiteboard, receipt, or sketch.",
+        "NSPhotoLibraryUsageDescription": "Pick an existing photo to attach to a task.",
         "UIBackgroundModes": []
       }
     },
@@ -50,6 +52,13 @@
         "expo-notifications",
         {
           "color": "#FF8A3D"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Attach photos to your tasks — a snap of a whiteboard, receipt, or sketch.",
+          "photosPermission": "Pick an existing photo to attach to a task."
         }
       ]
     ],

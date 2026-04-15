@@ -220,6 +220,11 @@ export default function SettingsScreen() {
       {/* Shortcuts */}
       <Text style={sectionTitle}>Raccourcis</Text>
       <View style={card}>
+        <Pressable onPress={() => router.push('/insights')} style={row}>
+          <Text style={[fonts.body, { flex: 1, color: palette.text }]}>Insights</Text>
+          <Text style={{ color: palette.textMuted, fontSize: 18 }}>›</Text>
+        </Pressable>
+        <View style={{ height: 1, backgroundColor: palette.outline }} />
         <Pressable onPress={() => router.push('/filters')} style={row}>
           <Text style={[fonts.body, { flex: 1, color: palette.text }]}>{t('filters_title')}</Text>
           <Text style={{ color: palette.textMuted, fontSize: 18 }}>›</Text>
