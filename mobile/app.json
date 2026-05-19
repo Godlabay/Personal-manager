@@ -1,0 +1,77 @@
+{
+  "expo": {
+    "name": "Personal Manager",
+    "slug": "personal-manager",
+    "scheme": "personalmanager",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1E1612"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.personalmanager.ios",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "We use the microphone only when you tap the voice-capture button, to turn your spoken notes into tasks. Recognition runs on-device whenever possible.",
+        "NSSpeechRecognitionUsageDescription": "We use speech recognition to turn your voice notes into tasks. It runs on-device when your device supports it.",
+        "NSCameraUsageDescription": "Attach photos to your tasks — a snap of a whiteboard, receipt, or sketch.",
+        "NSPhotoLibraryUsageDescription": "Pick an existing photo to attach to a task.",
+        "UIBackgroundModes": []
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1E1612"
+      },
+      "package": "app.personalmanager.android",
+      "permissions": ["RECORD_AUDIO"]
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-localization",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Allow Personal Manager to access the microphone for voice capture.",
+          "speechRecognitionPermission": "Allow Personal Manager to recognize speech on-device.",
+          "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#FF8A3D"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Attach photos to your tasks — a snap of a whiteboard, receipt, or sketch.",
+          "photosPermission": "Pick an existing photo to attach to a task."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": ""
+      }
+    }
+  }
+}

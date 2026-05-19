@@ -1,0 +1,52 @@
+# macOS
+.DS_Store
+*.swp
+
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcuserdatad/
+xcuserdata/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.perspectivev3
+!default.perspectivev3
+*.xccheckout
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Generated Xcode project (we use XcodeGen)
+ios/PersonalManager.xcodeproj/
+ios/PersonalManager.xcworkspace/
+
+# Swift Package Manager
+.swiftpm/
+.build/
+Packages/
+Package.pins
+Package.resolved
+
+# Environment
+.env
+.env.local
+*.env
+
+# Supabase
+supabase/.branches
+supabase/.temp
+supabase/.env
+supabase/.env.local
+
+# Node (for potential tooling)
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+
+# Claude planning files (don't leak internal notes)
+.claude/

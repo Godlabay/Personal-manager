@@ -1,0 +1,26 @@
+node_modules/
+.expo/
+dist/
+web-build/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Native
+ios/
+android/
+
+# macOS
+.DS_Store
+
+# Logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+
+# Editor
+.vscode/
+.idea/
